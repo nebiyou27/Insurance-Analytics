@@ -1,42 +1,42 @@
 import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import LabelEncoder
 
 def preprocess_data(df):
-    # Convert TransactionMonth to datetime format if it's not already
-    df['TransactionMonth'] = pd.to_datetime(df['TransactionMonth'], errors='coerce')
-    
-    # Handle categorical variables
-    categorical_cols = ['Citizenship', 'LegalType', 'Title', 'Bank', 'AccountType', 'MaritalStatus', 'Gender', 
-                        'Province', 'MainCrestaZone', 'SubCrestaZone', 'VehicleType', 'make', 'Model', 'bodytype', 
-                        'AlarmImmobiliser', 'TrackingDevice', 'NewVehicle', 'WrittenOff', 'Rebuilt', 'Converted', 
-                        'TermFrequency', 'CoverCategory', 'CoverType', 'CoverGroup', 'Section', 'Product']
-    
-    label_encoders = {}
-    for col in categorical_cols:
-        le = LabelEncoder()
-        df[col] = le.fit_transform(df[col].astype(str))
-        label_encoders[col] = le
-    
-    # Handle missing values
-    df.fillna(df.median(numeric_only=True), inplace=True)
-    
-    return df, label_encoders
+    """
+    Preprocesses the insurance data.
 
-def correlation_analysis(df):
-    # Compute correlation matrix
-    corr_matrix = df.corr()
-    
-    # Display the magnitude of correlation
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(corr_matrix, cmap='coolwarm', annot=True, fmt='.2f', linewidths=0.5)
-    plt.title('Feature Correlation Heatmap')
-    plt.show()
-    
-    return corr_matrix
+    Args:
+        df (pandas.DataFrame): The input DataFrame.
 
-# Example usage (assuming df is your DataFrame)
-# df, encoders = preprocess_data(df)
-# corr_matrix = correlation_analysis(df)
+    Returns:
+        pandas.DataFrame: The preprocessed DataFrame.
+    """
+
+    # 1. Drop Redundant Columns
+    df = df.drop(['UnderwrittenCoverID', 'NumberOfVehiclesInFleet'], axis=1)
+
+    # 2. Handle Missing Values (customize based on your strategy)
+    # Example: Fill numerical missing values with median, categorical with mode
+    for col in df.select_dtypes(include=['number']).columns:
+        df[col] = df[col].fillna(df[col].median())
+    for col in df.select_dtypes(include=['object']).columns:
+        df[col] = df[col].fillna(df[col].mode()[0])
+
+    # 3. Convert Data Types
+    df['TransactionMonth'] = pd.to_datetime(df['TransactionMonth'])
+    df['PostalCode'] = df['PostalCode'].astype(str)
+
+    # 4. Handle Outliers (example: using IQR method for 'TotalPremium')
+    Q1 = df['TotalPremium'].quantile(0.25)
+    Q3 = df['TotalPremium'].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    df = df[(df['TotalPremium'] >= lower_bound) & (df['TotalPremium'] <= upper_bound)]
+
+    # 5. Handle Categorical Variables (example: one-hot encoding)
+    df = pd.get_dummies(df, columns=df.select_dtypes(include=['object']).columns, drop_first=True)
+
+    # 6. Clean column names.
+    df.columns = df.columns.str.lower().str.replace(' ', '_')
+
+    return df
