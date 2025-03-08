@@ -1,6 +1,7 @@
 # src/data/loader.py
-import pandas as pd
 import os
+
+import pandas as pd
 
 
 def load_data(filepath):
