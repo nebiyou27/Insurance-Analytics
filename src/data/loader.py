@@ -2,6 +2,7 @@
 import pandas as pd
 import os
 
+
 def load_data(filepath):
     """
     Loads data from a CSV file into a pandas DataFrame.
@@ -22,9 +23,10 @@ def load_data(filepath):
         print(f"An error occurred: {e}")
         return None
 
+
 if __name__ == "__main__":
     # Example usage (replace with your actual file path)
-    filepath = r"C:\Users\neba\Documents\week-3\MachineLearningRating_v3.csv" #Make sure to use raw strings for windows paths.
+    filepath = r"C:\Users\neba\Documents\week-3\MachineLearningRating_v3.csv"  # Make sure to use raw strings for windows paths.
 
     if os.path.exists(filepath):
         loaded_df = load_data(filepath)
