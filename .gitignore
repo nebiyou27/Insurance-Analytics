@@ -7,4 +7,4 @@ env/
 .pytest_cache
 .csv 
 .dvc/cache/
-.dvc_storage/
+dvc_storage/
