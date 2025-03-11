@@ -10,11 +10,13 @@ sys.path.insert(
 
 from src.utils.helpers import calculate_moving_average, normalize_column
 
+
 def test_calculate_moving_average():
     data = [1, 2, 3, 4, 5]
     expected = [None, None, 2.0, 3.0, 4.0]
     result = calculate_moving_average(data, 3)
     assert result == expected
+
 
 def test_normalize_column():
     data = [10, 20, 30, 40, 50]
