@@ -2,5 +2,7 @@ __pycache__/
 *.pyc
 .DS_Store
 venv/
-.env
+env/
 *.csv
+.pytest_cache
+.csv 
